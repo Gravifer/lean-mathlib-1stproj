@@ -7,7 +7,7 @@ package «lean-matlib-1stproj» where
   keywords := #["math"]
   leanOptions :=
   #[⟨`pp.unicode.fun, true⟩, ⟨`autoImplicit, false⟩, ⟨`relaxedAutoImplicit, false⟩,
-    ⟨`weak.linter.mathlibStandardSet, true⟩, ⟨`maxSynthPendingDepth, 3⟩]
+    ⟨`weak.linter.mathlibStandardSet, true⟩, ⟨`maxSynthPendingDepth, Lean.LeanOptionValue.ofNat 3⟩]
 
 require "leanprover-community" / mathlib
 
