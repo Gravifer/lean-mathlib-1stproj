@@ -19,13 +19,13 @@ jobs:
       - uses: actions/checkout@v5
       - uses: leanprover/lean-action@v1
         
-      # Override Ruby setup so it's >= 3.2 before docgen-action
-      - name: Setup Ruby 3.2
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "3.2"
-          bundler-cache: true
-          working-directory: home_page
+      # # Override Ruby setup so it's >= 3.2 before docgen-action
+      # - name: Setup Ruby 3.2
+      #   uses: ruby/setup-ruby@v1
+      #   with:
+      #     ruby-version: "3.2"
+      #     bundler-cache: true
+      #     working-directory: home_page
       - name: Build project documentation.
         id: build-docgen
         uses: leanprover-community/docgen-action@v1
