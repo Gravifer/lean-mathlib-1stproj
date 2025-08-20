@@ -22,4 +22,4 @@ jobs:
         id: build-docgen
         uses: leanprover-community/docgen-action@v1
         with:
-          blueprint: true
+          blueprint: false
