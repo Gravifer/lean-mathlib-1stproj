@@ -14,6 +14,12 @@ maxSynthPendingDepth = 3
 name = "mathlib"
 scope = "leanprover-community"
 
+[[require]]
+name = "Paperproof"
+git = "https://github.com/Paper-Proof/paperproof.git"
+subDir = "lean"
+rev = "main"
+
 [[lean_lib]]
 name = "LeanMathlib1stproj"
 
