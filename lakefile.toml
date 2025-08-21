@@ -1,7 +1,7 @@
 name = "lean-mathlib-1stproj"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["lean-mathlib-1stproj", "LeanMathlib1stproj"]
+defaultTargets = ["LeanMathlib1stproj"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
