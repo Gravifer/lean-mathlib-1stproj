@@ -131,3 +131,9 @@ def fifth {α} (xs : List α) (ok : xs.length > 4) : α := xs[4]
 !   woodlandCritters.length > 4
 ! is falseLean 4
 -/
+
+-- ## explore notation -- * see https://leanprover-community.github.io/archive/stream/270676-lean4/topic/analogue.20of.20.23print.20notation.html
+-- // #check (↦)
+-- // #print notation ↦
+-- // #print (· ↦ ·)
+-- @pcpthm's [print_notation.lean](https://gist.github.com/pcpthm/b88152daeeb684948d768766a49f2534#file-print_notation-lean)
