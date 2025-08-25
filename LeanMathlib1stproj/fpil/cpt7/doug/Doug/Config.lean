@@ -19,8 +19,10 @@ namespace Doug
   def Config.inDirectory (cfg : Config) : Config :=
   {cfg with currentPrefix := cfg.preDir ++ " " ++ cfg.currentPrefix}
 
-  def ConfigIO (α : Type) : Type :=
-    Config → IO α
+  abbrev ConfigIO (α : Type) : Type := ReaderT Config IO α
+
+  -- def ConfigIO (α : Type) : Type :=
+  --   Config → IO α
 
   instance : Monad ConfigIO where
     pure x := fun _ => pure x

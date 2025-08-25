@@ -28,19 +28,19 @@ def toEntry (path : System.FilePath) : IO (Option Entry) := do
     pure (some (if pathIsDir then .dir name else .file name))
 
 def showFileName (file : String) : ConfigIO Unit := do
-  runIO (IO.println ((← currentConfig).fileName file))
+  IO.println s!"{(← read).currentPrefix} {file}"
 
 def showDirName (dir : String) : ConfigIO Unit := do
-  runIO (IO.println ((← currentConfig).dirName dir))
+  IO.println s!"{(← read).currentPrefix} {dir}/"
 
 partial def dirTree (path : System.FilePath) : ConfigIO Unit := do
-  match ← runIO (toEntry path) with
+  match ← toEntry path with
     | none => pure ()
     | some (.file name) => showFileName name
     | some (.dir name) =>
       showDirName name
-      let contents ← runIO path.readDir
-      locally (·.inDirectory)
+      let contents ← path.readDir
+      withReader (·.inDirectory)
         (doList contents.toList fun d =>
           dirTree d.path)
 
