@@ -52,25 +52,37 @@ def DirFromArgs (args : List String) : Except Unit (Option System.FilePath) := d
 
 end Doug
 
+-- Helper function to resolve . and .. components manually
+def resolvePath (path : System.FilePath) : System.FilePath :=
+  let components := path.components
+  let resolved := components.foldl (fun acc component =>
+    match component with
+    | "." => acc  -- Skip current directory
+    | ".." => if acc.isEmpty then acc else acc.pop  -- Go up one directory
+    | comp => acc.push comp
+  ) #[]
+  let pathStr := String.intercalate (toString System.FilePath.pathSeparator) resolved.toList
+  System.FilePath.mk pathStr
+
 open Doug in
 def main (args : List String) : IO UInt32 := do
   let cwd ← IO.currentDir
   match DirFromArgs args with
   | Except.ok argDir =>
-      IO.eprintln s!"Debug: passed path argument is {argDir}"
+      -- IO.eprintln s!"Debug: (cwd: {cwd}) passed path argument is {argDir}"
       -- Determine the start directory: cwd, relative to cwd, or absolute
       let startDir ← match argDir with
         | none => pure cwd  -- No directory specified, use cwd
         | some path =>
-            if path.isAbsolute then
-              pure path  -- Absolute path, use as-is
-            else
-              pure (cwd.join path).normalize  -- Relative path, resolve relative to cwd
+            let normalizedPath := (if path.isAbsolute then path else cwd.join path).normalize
+            -- IO.eprintln s!"Debug: trying to resolve {normalizedPath}"
+            -- Try to get the canonical/real path to resolve . and .. components
+            pure $ resolvePath normalizedPath
 
       -- Check if the directory exists
       let dirValid ← startDir.isDir
+      -- IO.eprintln s!"Debug: start directory is {startDir}"
       if dirValid then
-        IO.eprintln s!"Debug: start directory is {startDir}"
         match configFromArgs (args.takeWhile fun str => str.startsWith "-" && str != "--") with
         | some config =>
             match config with
