@@ -59,4 +59,12 @@ namespace Doug
   def runIO (action : IO α) : ConfigIO α :=
     fun _ => action
 
+  def showFileName (file : String) : ConfigIO Unit := do
+    let cfg ← currentConfig
+    IO.println $ cfg.fileName file
+
+  def showDirName (dir : String) : ConfigIO Unit := do
+    let cfg ← currentConfig
+    IO.println $ cfg.dirName  dir
+
 end Doug

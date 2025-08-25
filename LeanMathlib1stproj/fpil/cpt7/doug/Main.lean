@@ -21,26 +21,17 @@ def toEntry (path : System.FilePath) : IO (Option Entry) := do
       -- IO.eprintln s!"Debug: \"{name}\" is a {if pathIsDir then "directory" else "file"}" -- Debug: print result of isDir
       pure ∘ some $ if pathIsDir then .dir name else .file name
 
-def showFileName (file : String) : ConfigIO Unit := do
-  let cfg ← currentConfig
-  if cfg.showHidden || !Entry.isHidden (.file file) then
-    IO.println $ cfg.fileName file
-
-def showDirName (dir : String) : ConfigIO Unit := do
-  let cfg ← currentConfig
-  if cfg.showHidden || !Entry.isHidden (.dir  dir ) then
-    IO.println $ cfg.dirName  dir
-
 partial def dirTree (path : System.FilePath) : ConfigIO Unit := do
+  let cfg ← currentConfig
   match ← toEntry path with
   | none => pure ()
-  | some (.file name) => showFileName name
-  | some (.dir  name) =>
-      showDirName name
-      let contents ← path.readDir
-      withReader (·.inDirectory)
-        (doList contents.toList fun d =>
-          dirTree d.path)
+  | some entry => if cfg.showHidden || !entry.isHidden then match entry with
+      | (.file name) => showFileName name
+      | (.dir  name) => showDirName  name
+                        let contents ← path.readDir
+                        withReader (·.inDirectory)
+                          (doList contents.toList fun d =>
+                            dirTree d.path)
 
 end Doug
 
