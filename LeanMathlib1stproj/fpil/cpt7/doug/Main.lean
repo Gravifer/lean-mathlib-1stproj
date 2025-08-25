@@ -5,39 +5,50 @@ import Doug.Config
 namespace Doug
 
 def usage : String :=
-  "Usage: doug [--ascii]
+  "Usage: doug [--ascii] [--all]
 Options:
-\t--ascii\tUse ASCII characters to display the directory structure"
+\t-A --ascii\tUse ASCII characters to display the directory structure
+\t-a --all  \tShow hidden files and directories"
 
-def configFromArgs : List String → Option Config
-  | [] => some {} -- both fields default
-  | ["--ascii"] => some {useASCII := true}
-  | _ => none
+def configFromArgs (args : List String) : Option Config :=
+  args.foldlM processArg {} where
+    processArg (config : Config) : String -> Option Config
+    | "-A" | "--ascii" => some {config with useASCII   := true}
+    | "-a" | "--all"   => some {config with showHidden := true}
+    | _ => none
 
 inductive Entry where
   | file : String → Entry
   | dir : String → Entry
+
+def Entry.isHidden : Entry → Bool
+  | .file name => name.startsWith "."
+  | .dir  name => name.startsWith "."
 
 def toEntry (path : System.FilePath) : IO (Option Entry) := do
   match path.components.getLast? with
   | none => pure (some (.dir ""))
   | some "." | some ".." => pure none
   | some name =>
-    let pathIsDir ← path.isDir
-    IO.eprintln s!"Debug: \"{name}\" is a {if pathIsDir then "directory" else "file"}" -- Debug: print result of isDir
-    pure (some (if pathIsDir then .dir name else .file name))
+      let pathIsDir ← path.isDir
+      -- IO.eprintln s!"Debug: \"{name}\" is a {if pathIsDir then "directory" else "file"}" -- Debug: print result of isDir
+      pure ∘ some $ if pathIsDir then .dir name else .file name
 
 def showFileName (file : String) : ConfigIO Unit := do
-  IO.println s!"{(← read).currentPrefix} {file}"
+  let cfg ← currentConfig
+  if cfg.showHidden || !Entry.isHidden (.file file) then
+    IO.println $ cfg.fileName file
 
 def showDirName (dir : String) : ConfigIO Unit := do
-  IO.println s!"{(← read).currentPrefix} {dir}/"
+  let cfg ← currentConfig
+  if cfg.showHidden || !Entry.isHidden (.dir  dir ) then
+    IO.println $ cfg.dirName  dir
 
 partial def dirTree (path : System.FilePath) : ConfigIO Unit := do
   match ← toEntry path with
-    | none => pure ()
-    | some (.file name) => showFileName name
-    | some (.dir name) =>
+  | none => pure ()
+  | some (.file name) => showFileName name
+  | some (.dir  name) =>
       showDirName name
       let contents ← path.readDir
       withReader (·.inDirectory)
@@ -50,12 +61,12 @@ open Doug in
 def main (args : List String) : IO UInt32 := do
   match configFromArgs args with
   | some config =>
-    (dirTree (← IO.currentDir)).run config
-    pure 0
+      (dirTree (← IO.currentDir)).run config
+      pure 0
   | none =>
-    IO.eprintln s!"Didn't understand argument(s) {" ".intercalate args}\n"
-    IO.eprintln usage
-    pure 1
+      IO.eprintln s!"Didn't understand argument(s) {" ".intercalate args}\n"
+      IO.eprintln usage
+      pure 1
 
 def main_bak : IO Unit :=
   IO.println s!"Hello, doug!"

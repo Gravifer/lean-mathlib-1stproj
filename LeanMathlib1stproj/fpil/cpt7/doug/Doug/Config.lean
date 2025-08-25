@@ -1,7 +1,8 @@
 namespace Doug
 
   structure Config where
-    useASCII : Bool := false
+    useASCII   : Bool := false
+    showHidden : Bool := false
     currentPrefix : String := ""
 
   def Config.preFile (cfg : Config) :=
@@ -17,7 +18,7 @@ namespace Doug
     s!"{cfg.currentPrefix}{cfg.preFile} {dir}/"
 
   def Config.inDirectory (cfg : Config) : Config :=
-  {cfg with currentPrefix := cfg.preDir ++ " " ++ cfg.currentPrefix}
+  {cfg with currentPrefix := cfg.preDir ++ " " ++ (cfg.currentPrefix/-.set 0 ' '-/)}
 
   abbrev ConfigIO (α : Type) : Type := ReaderT Config IO α
 
