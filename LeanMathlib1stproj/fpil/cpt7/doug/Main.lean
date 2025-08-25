@@ -41,6 +41,9 @@ partial def dirTree (cfg : Config) (path : System.FilePath) : IO Unit := do
     doList contents.toList fun d =>
       dirTree newConfig d.path
 
+end Doug
+
+open Doug in
 def main (args : List String) : IO UInt32 := do
   match configFromArgs args with
   | some config =>
@@ -51,4 +54,5 @@ def main (args : List String) : IO UInt32 := do
     IO.eprintln usage
     pure 1
 
-end Doug
+def main_bak : IO Unit :=
+  IO.println s!"Hello, doug!"
