@@ -1,4 +1,5 @@
 import Doug
+import Doug.Basic
 import Doug.Config
 
 namespace Doug
@@ -22,7 +23,9 @@ def toEntry (path : System.FilePath) : IO (Option Entry) := do
   | none => pure (some (.dir ""))
   | some "." | some ".." => pure none
   | some name =>
-    pure (some (if (← path.isDir) then .dir name else .file name))
+    let pathIsDir ← path.isDir
+    IO.eprintln s!"Debug: \"{name}\" is a {if pathIsDir then "directory" else "file"}" -- Debug: print number of contents found
+    pure (some (if pathIsDir then .dir name else .file name))
 
 def showFileName (cfg : Config) (file : String) : IO Unit := do
   IO.println (cfg.fileName file)
@@ -38,6 +41,7 @@ partial def dirTree (cfg : Config) (path : System.FilePath) : IO Unit := do
     showDirName cfg name
     let contents ← path.readDir
     let newConfig := cfg.inDirectory
+    IO.eprintln s!"Debug: Found {contents.size} entries in {name}" -- Debug: print number of contents found
     doList contents.toList fun d =>
       dirTree newConfig d.path
 
