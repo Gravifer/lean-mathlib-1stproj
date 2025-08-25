@@ -4,19 +4,6 @@ import Doug.Config
 
 namespace Doug
 
-def usage : String :=
-  "Usage: doug [--ascii] [--all]
-Options:
-\t-A --ascii\tUse ASCII characters to display the directory structure
-\t-a --all  \tShow hidden files and directories"
-
-def configFromArgs (args : List String) : Option Config :=
-  args.foldlM processArg {} where
-    processArg (config : Config) : String -> Option Config
-    | "-A" | "--ascii" => some {config with useASCII   := true}
-    | "-a" | "--all"   => some {config with showHidden := true}
-    | _ => none
-
 inductive Entry where
   | file : String → Entry
   | dir : String → Entry
@@ -61,7 +48,9 @@ open Doug in
 def main (args : List String) : IO UInt32 := do
   match configFromArgs args with
   | some config =>
-      (dirTree (← IO.currentDir)).run config
+      match config with
+      | {printHelp := true} => IO.println usage
+      | _ => (dirTree (← IO.currentDir)).run config
       pure 0
   | none =>
       IO.eprintln s!"Didn't understand argument(s) {" ".intercalate args}\n"

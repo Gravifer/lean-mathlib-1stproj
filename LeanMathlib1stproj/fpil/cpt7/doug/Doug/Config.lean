@@ -1,9 +1,25 @@
 namespace Doug
 
+  def usage : String :=
+    "Usage: doug [--ascii] [--all]
+  Options:
+  \t-a --all  \tShow hidden items
+  \t-A --ascii\tUse ASCII characters to display the directory structure
+  \t-h --help \tPrint this help message (ignores other flags)"
+
   structure Config where
     useASCII   : Bool := false
     showHidden : Bool := false
+    printHelp  : Bool := false
     currentPrefix : String := ""
+
+  def configFromArgs (args : List String) : Option Config :=
+    args.foldlM processArg {} where
+      processArg (config : Config) : String -> Option Config
+      | "-A" | "--ascii" => some $ if config.printHelp then config else {config with useASCII   := true}
+      | "-a" | "--all"   => some $ if config.printHelp then config else {config with showHidden := true}
+      | "-h" | "--help"  => some $ {printHelp := true} -- * purge all other options
+      | _ => none
 
   def Config.preFile (cfg : Config) :=
     if cfg.useASCII then "|--" else "├──"
