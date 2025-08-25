@@ -58,23 +58,36 @@ def main (args : List String) : IO UInt32 := do
   match DirFromArgs args with
   | Except.ok argDir =>
       IO.eprintln s!"Debug: passed path argument is {argDir}"
-      -- todo: check if directory exists, and whether it's relative
-      let startDir := argDir.getD cwd
-      IO.eprintln s!"Debug: start directory is {startDir}"
-      match configFromArgs (args.takeWhile fun str => str.startsWith "-" && str != "--") with
-      | some config =>
-          match config with
-          | {printHelp := true} => IO.println usage
-          | _ => (dirTree startDir).run config
-          pure 0
-      | none =>
-          IO.eprintln s!"Didn't understand argument(s) {" ".intercalate args}\n"
-          IO.eprintln usage
-          pure 1
+      -- Determine the start directory: cwd, relative to cwd, or absolute
+      let startDir ← match argDir with
+        | none => pure cwd  -- No directory specified, use cwd
+        | some path =>
+            if path.isAbsolute then
+              pure path  -- Absolute path, use as-is
+            else
+              pure (cwd.join path).normalize  -- Relative path, resolve relative to cwd
+
+      -- Check if the directory exists
+      let dirValid ← startDir.isDir
+      if dirValid then
+        IO.eprintln s!"Debug: start directory is {startDir}"
+        match configFromArgs (args.takeWhile fun str => str.startsWith "-" && str != "--") with
+        | some config =>
+            match config with
+            | {printHelp := true} => IO.println usage
+            | _ => (dirTree startDir).run config
+            pure 0
+        | none =>
+            IO.eprintln s!"Didn't understand argument(s) {" ".intercalate args}\n"
+            IO.eprintln usage
+            pure 1
+      else
+        IO.eprintln s!"Error: '{startDir}' does not exist or is not a directory"
+        pure 2
   | Except.error _ =>
       IO.eprintln "Error: No directory path provided after '--'"
       IO.eprintln usage
-      pure 1
+      pure 3
 
 def main_bak : IO Unit :=
   IO.println s!"Hello, doug!"
