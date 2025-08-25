@@ -24,26 +24,25 @@ def toEntry (path : System.FilePath) : IO (Option Entry) := do
   | some "." | some ".." => pure none
   | some name =>
     let pathIsDir ← path.isDir
-    IO.eprintln s!"Debug: \"{name}\" is a {if pathIsDir then "directory" else "file"}" -- Debug: print number of contents found
+    IO.eprintln s!"Debug: \"{name}\" is a {if pathIsDir then "directory" else "file"}" -- Debug: print result of isDir
     pure (some (if pathIsDir then .dir name else .file name))
 
-def showFileName (cfg : Config) (file : String) : IO Unit := do
-  IO.println (cfg.fileName file)
+def showFileName (file : String) : ConfigIO Unit := do
+  runIO (IO.println ((← currentConfig).fileName file))
 
-def showDirName (cfg : Config) (dir : String) : IO Unit := do
-  IO.println (cfg.dirName dir)
+def showDirName (dir : String) : ConfigIO Unit := do
+  runIO (IO.println ((← currentConfig).dirName dir))
 
-partial def dirTree (cfg : Config) (path : System.FilePath) : IO Unit := do
-  match ← toEntry path with
-  | none => pure ()
-  | some (.file name) => showFileName cfg name
-  | some (.dir name) =>
-    showDirName cfg name
-    let contents ← path.readDir
-    let newConfig := cfg.inDirectory
-    IO.eprintln s!"Debug: Found {contents.size} entries in {name}" -- Debug: print number of contents found
-    doList contents.toList fun d =>
-      dirTree newConfig d.path
+partial def dirTree (path : System.FilePath) : ConfigIO Unit := do
+  match ← runIO (toEntry path) with
+    | none => pure ()
+    | some (.file name) => showFileName name
+    | some (.dir name) =>
+      showDirName name
+      let contents ← runIO path.readDir
+      locally (·.inDirectory)
+        (doList contents.toList fun d =>
+          dirTree d.path)
 
 end Doug
 
@@ -51,10 +50,10 @@ open Doug in
 def main (args : List String) : IO UInt32 := do
   match configFromArgs args with
   | some config =>
-    dirTree config (← IO.currentDir)
+    (dirTree (← IO.currentDir)).run config
     pure 0
   | none =>
-    IO.eprintln s!"Didn't understand argument(s) {" ".intercalate args}\n" -- * renamed from String.separate
+    IO.eprintln s!"Didn't understand argument(s) {" ".intercalate args}\n"
     IO.eprintln usage
     pure 1
 
