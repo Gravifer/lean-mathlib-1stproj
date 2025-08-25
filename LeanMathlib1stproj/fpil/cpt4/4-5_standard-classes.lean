@@ -15,7 +15,7 @@ structure NonEmptyList (α : Type) : Type where
 #eval 1 + 1
 
 set_option diagnostics true in
-#eval (fun (x : Nat) => 1 + x) == (Nat.succ ·)
+#check_failure (fun (x : Nat) => 1 + x) == (Nat.succ ·)
 
 #check (fun (x : Nat) => 1 + x) = (Nat.succ ·)
 
@@ -25,7 +25,7 @@ set_option diagnostics true in
 #check (2 < 4)
 #eval decide (2 < 4)
 
-#eval decide $ (fun (x : Nat) => 1 + x) = (Nat.succ ·)
+#check_failure decide $ (fun (x : Nat) => 1 + x) = (Nat.succ ·)
 #print LT
 #print Ordering
 
