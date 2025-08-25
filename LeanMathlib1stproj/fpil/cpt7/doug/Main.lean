@@ -37,11 +37,12 @@ end Doug
 
 open Doug in
 def main (args : List String) : IO UInt32 := do
+  let cwd ← IO.currentDir
   match configFromArgs args with
   | some config =>
       match config with
       | {printHelp := true} => IO.println usage
-      | _ => (dirTree (← IO.currentDir)).run config
+      | _ => (dirTree cwd).run config
       pure 0
   | none =>
       IO.eprintln s!"Didn't understand argument(s) {" ".intercalate args}\n"

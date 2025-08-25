@@ -1,11 +1,11 @@
 namespace Doug
 
   def usage : String :=
-    "Usage: doug [--ascii] [--all]
-  Options:
-  \t-a --all  \tShow hidden items
-  \t-A --ascii\tUse ASCII characters to display the directory structure
-  \t-h --help \tPrint this help message (ignores other flags)"
+    "Usage: doug [--ascii] [--all] [--] [path]
+Options:
+\t-a --all  \tShow hidden items
+\t-A --ascii\tUse ASCII characters to display the directory structure
+\t-h --help \tPrint this help message (ignores other flags)"
 
   structure Config where
     useASCII   : Bool := false
