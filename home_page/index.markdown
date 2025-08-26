@@ -12,12 +12,25 @@ layout: home
 
 ## Links
 
-- [Functional Programming in Lean](https://leanprover.github.io/functional_programming_in_lean "Haskell-like introduction")
+- [Functional Programming in Lean @ 4.1.0](https://leanprover.github.io/functional_programming_in_lean "Haskell-like introduction")
+  - [Newer version @ 4.21.0](https://lean-lang.org/functional_programming_in_lean)
 - [Theorem Proving in Lean](https://lean-lang.org/theorem_proving_in_lean4/)
 - [Mathematics in Lean](https://leanprover-community.github.io/mathematics_in_lean/)
 - [Metaprogramming in Lean](https://leanprover-community.github.io/lean4-metaprogramming-book)
   - [Short introduction](https://github.com/leanprover-community/mathlib4/wiki/Metaprogramming-for-dummies "metaprogramming-for-dummies")
+- [How to Prove It - with Lean](https://djvelleman.github.io/HTPIwL/)
+- [Hitchhiker's Guide to Logical Verification](https://github.com/blanchette/interactive_theorem_proving_2025)
+- [Glimpse of Lean](https://github.com/PatrickMassot/GlimpseOfLean)
+- [The Mechanics of Proof](https://github.com/hrmacbeth/math2001)
 
 ## See also
-
+- [Next steps from FPIL](https://leanprover.github.io/functional_programming_in_lean/next-steps.html)
+- [Community sources for learning Lean 4](https://leanprover-community.github.io/learn.html)
 - [Significant changes in Lean 4 from Lean 3](https://lean-lang.org/lean4/doc/lean3changes.html)
+- [Batteries (previously `std4`)](https://github.com/leanprover-community/batteries)
+- [Typechecking in Lean 4](https://ammkrn.github.io/type_checking_in_lean4/)
+- [Foundations of Lean](https://leanprover-community.github.io/lean-perfectoid-spaces/type_theory.html)
+- [The HoTT Book](https://homotopytypetheory.org/book/)
+- [Rocq : mathematical components](https://math-comp.github.io/mcb/)
+- [Software Foundations @ UPenn](https://softwarefoundations.cis.upenn.edu/)
+- [Type driven development with Idris](https://www.manning.com/books/type-driven-development-with-idris)
