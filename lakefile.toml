@@ -20,6 +20,11 @@ git = "https://github.com/Paper-Proof/paperproof.git"
 subDir = "lean"
 rev = "main"
 
+[[require]]
+name = "UnicodeBasic"
+git = "https://github.com/fgdorais/lean4-unicode-basic.git"
+rev = "main" # or any specific revision
+
 [[lean_lib]]
 name = "LeanMathlib1stproj"
 

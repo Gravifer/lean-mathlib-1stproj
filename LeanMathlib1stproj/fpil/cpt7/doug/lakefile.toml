@@ -2,6 +2,18 @@ name = "doug"
 version = "0.1.0"
 defaultTargets = ["doug"]
 
+[leanOptions]
+pp.unicode.fun = true # pretty-prints `fun a ↦ b`
+# autoImplicit = false
+# relaxedAutoImplicit = false
+weak.linter.mathlibStandardSet = true
+maxSynthPendingDepth = 3
+
+[[require]]
+name = "UnicodeBasic"
+git = "https://github.com/fgdorais/lean4-unicode-basic.git"
+rev = "main" # or any specific revision
+
 [[lean_lib]]
 name = "Doug"
 
