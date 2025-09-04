@@ -138,7 +138,7 @@ theorem t2 : q → p := t1'' hp
     ! may compromise logical consistency.
   For example, we can use it to postulate that
     ! the empty type `False` has an element: -/
-  section ex_falso_quodlibet
+  namespace ex_falso_quodlibet
     axiom unsound : False -- * Everything follows from false
     theorem ex : 1 = 0 :=
       False.elim unsound
@@ -258,44 +258,96 @@ example (p q : Prop) : ¬(p ∧ ¬q) → (p → q) :=
 end sect6
 
 section sect7 -- ## Exercises
-variable (p q r : Prop)
+variable (p q r : Prop) -- ! all can be done `by grind`, but don't
 
   -- commutativity of ∧ and ∨
-  example : p ∧ q ↔ q ∧ p := sorry
-  example : p ∨ q ↔ q ∨ p := sorry
+  example : p ∧ q ↔ q ∧ p := and_comm -- `And.comm` from `Init.Core`
+  example : p ∨ q ↔ q ∨ p := or_comm -- `Or.comm`
 
   -- associativity of ∧ and ∨
-  example : (p ∧ q) ∧ r ↔ p ∧ (q ∧ r) := sorry
-  example : (p ∨ q) ∨ r ↔ p ∨ (q ∨ r) := sorry
+  example : (p ∧ q) ∧ r ↔ p ∧ (q ∧ r) := and_assoc -- from `Init.SimpleLemmas`
+  example : (p ∨ q) ∨ r ↔ p ∨ (q ∨ r) := or_assoc
 
   -- distributivity
-  example : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := sorry
-  example : p ∨ (q ∧ r) ↔ (p ∨ q) ∧ (p ∨ r) := sorry
+  example : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := and_or_left -- from `Init.PropLemmas`
+  example : p ∨ (q ∧ r) ↔ (p ∨ q) ∧ (p ∨ r) := or_and_left
 
   -- other properties
-  example : (p → (q → r)) ↔ (p ∧ q → r) := sorry
-  example : ((p ∨ q) → r) ↔ (p → r) ∧ (q → r) := sorry
-  example : ¬(p ∨ q) ↔ ¬p ∧ ¬q := sorry
-  example : ¬p ∨ ¬q → ¬(p ∧ q) := sorry
-  example : ¬(p ∧ ¬p) := sorry
-  example : p ∧ ¬q → ¬(p → q) := sorry
-  example : ¬p → (p → q) := sorry
-  example : (¬p ∨ q) → (p → q) := sorry
-  example : p ∨ False ↔ p := sorry
-  example : p ∧ False ↔ False := sorry
-  example : (p → q) → (¬q → ¬p) := sorry
-
+  example : (p → (q → r)) ↔ (p ∧ q → r) := by exact Iff.symm and_imp -- when in doubt, `by exact?`
+    -- ⟨fun h ⟨hp, hq⟩ => h hp hq, fun h hp hq => h ⟨hp, hq⟩⟩ -- by
+    -- apply Iff.intro
+    -- · intro h ⟨hp, hq⟩
+    --   exact h hp hq
+    -- · intro h hp hq
+    --   exact h ⟨hp, hq⟩
+  example : ((p ∨ q) → r) ↔ (p → r) ∧ (q → r) := or_imp
+  example : ¬(p ∨ q) ↔ ¬p ∧ ¬q := not_or
+  example : ¬p ∨ ¬q → ¬(p ∧ q) := not_and_of_not_or_not
+  example : ¬(p ∧ ¬p) := and_not_self
+  example : p ∧ ¬q → ¬(p → q) := not_imp_of_and_not
+  example : ¬p → (p → q) := by  -- `False.elim` from `Init.Prelude`
+    intro n p; exact absurd p n
+  example : (¬p ∨ q) → (p → q) := by
+    intro h hp; cases h with
+    | inl np => exact absurd hp np
+    | inr hq => exact hq
+  example : p ∨ False ↔ p := or_iff_left id
+  example : p ∧ False ↔ False := by
+    apply Iff.intro
+    · intro h; exact h.right
+    · intro f; exact False.elim f
+  example : (p → q) → (¬q → ¬p) := -- fun pq nq ↦ nq ∘ pq  -- `Function.comp` reversed
+    mt  -- * modus tollens / contrapositive from `Lean.Core`
 
   open Classical
 
-  example : (p → q ∨ r) → ((p → q) ∨ (p → r)) := sorry
-  example : ¬(p ∧ q) → ¬p ∨ ¬q := sorry
-  example : ¬(p → q) → p ∧ ¬q := sorry
-  example : (p → q) → (¬p ∨ q) := sorry
-  example : (¬q → ¬p) → (p → q) := sorry
-  example : p ∨ ¬p := sorry
-  example : (((p → q) → p) → p) := sorry
-
+  example : (p → q ∨ r) → ((p → q) ∨ (p → r)) := by
+    intro h; by_cases hp : p -- from `Classical.ByCases`
+    · by_cases hq : q
+      · exact Or.inl (fun _ => hq)
+      · exact Or.inr (fun _ => (h hp).resolve_left hq)
+    · exact Or.inl (fun hp' => absurd hp' hp)
+    -- intro h
+    -- cases em p with -- excluded middle from `Classical`
+    -- | inl hp =>
+    --   cases em q with
+    --   | inl hq => exact Or.inl (fun _ => hq)
+    --   | inr hnq =>
+    --     cases em r with
+    --     | inl hr => exact Or.inr (fun _ => hr)
+    --     | inr hnr => exfalso; exact hnr $ (h hp).resolve_left hnq -- `exfalso` from `Init.Tactics`
+    -- | inr hnp => exact Or.inl (fun hp => absurd hp hnp)
+  example : ¬(p ∧ q) → ¬p ∨ ¬q := by
+    intro h; by_cases hp : p
+    · right; intro hq; exact h ⟨hp, hq⟩
+    · left;  exact hp
+  example : ¬(p → q) → p ∧ ¬q := by
+    intro h; constructor
+    · by_cases hp : p; exact hp
+      · exfalso; apply h; intro hp'; exact absurd hp' hp
+    · intro hq; apply h; intro _; exact hq
+    -- intro h; by_cases hp : p
+    -- · by_cases hq : q
+    --   · exfalso; exact h (fun _ => hq)
+    --   · exact ⟨hp, hq⟩
+    -- · by_cases hq : q
+    --   · exfalso; exact h (fun _ => hq)
+    --   · exfalso; exact h (fun p' => absurd hp (not_not.mpr p'))
+  example : (p → q) → (¬p ∨ q) := by
+    intro h; by_cases hp : p
+    · right; exact h hp
+    · left;  exact hp
+  example : (¬q → ¬p) → (p → q) := by
+    intro h hp; by_cases hq : q; exact hq
+    · exfalso; exact h hq hp
+  example : p ∨ ¬p := em p
+  example : (((p → q) → p) → p) := by
+    intro h; by_cases hp : p; exact hp
+    · apply h; intro hp'; exfalso; exact hp hp'
+    -- intro h; by_cases hp : p; exact hp
+    -- · by_cases hq : q;
+    --   . exact h (fun _ => hq)
+    --   · exact h (fun hp' => absurd hp' hp)
 
 end sect7
 
