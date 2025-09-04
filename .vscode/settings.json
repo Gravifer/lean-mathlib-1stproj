@@ -62,5 +62,21 @@
         "**/.vscode": false,
         "**/.wakatime-project": false
     },
-    "explorerExclude.backup": {}
+    "explorerExclude.backup": {},
+    "commentAnchors.tags.matchPrefix": [
+        "<!--",
+        "//",
+        "/*",
+        "/**",
+        "*",
+        "#",
+        "/-",
+        "--"
+    ],
+    "commentAnchors.tags.matchSuffix": [
+        "-->",
+        "*/",
+        "-/"
+    ],
+    "bookmarks.saveBookmarksInProject": true
 }
