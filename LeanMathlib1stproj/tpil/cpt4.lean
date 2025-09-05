@@ -174,13 +174,15 @@ example (h₁ : divides x y) (h₂ : y = z) : divides x (2*z) :=
     _ = z           := h₂
     divides _ (2*z) := divides_mul ..
 
-infix:50 " | " => divides -- can be entered as `\dvd` or `\mid`
+namespace DividesNotation
+infix:50 " ∣∣ " => divides -- can be entered as `\dvd` or `\mid`
 
 example (h₁ : divides x y) (h₂ : y = z) : divides x (2*z) :=
   calc
-    x | y   := h₁
+    x ∣∣ y   := h₁
     _ = z   := h₂
-    _ | 2*z := divides_mul ..
+    _ ∣∣ 2*z := divides_mul ..
+end DividesNotation
 
 
 variable (x y : Nat)
@@ -397,22 +399,42 @@ example (n : Nat) : Nat := ‹Nat›
 
 
 -- ## §4.6 Exercises
+set_option linter.unusedVariables false
 variable (α : Type) (p q : α → Prop)
 
 /- 1. Prove these equivalences -/
-example : (∀ x, p x ∧ q x) ↔ (∀ x, p x) ∧ (∀ x, q x) := sorry
-example : (∀ x, p x → q x) → (∀ x, p x) → (∀ x, q x) := sorry
-example : (∀ x, p x) ∨ (∀ x, q x) → ∀ x, p x ∨ q x := sorry  -- * try and understand why the reverse implication is not derivable
-
+example : (∀ x, p x ∧ q x) ↔ (∀ x, p x) ∧ (∀ x, q x) := by
+  constructor
+  · intro h; exact ⟨fun x => (h x).left, fun x => (h x).right⟩
+  · intro ⟨hp, hq⟩ x; exact ⟨hp x, hq x⟩
+example : (∀ x, p x → q x) → (∀ x, p x) → (∀ x, q x) := by
+  intro h1 h2 x; exact h1 x (h2 x)
+example : (∀ x, p x) ∨ (∀ x, q x) → ∀ x, p x ∨ q x := by  -- * try and understand why the reverse implication is not derivable
+  intro g x; cases g
+  · left;  apply ‹∀ x, p x›
+  · right; apply ‹∀ x, q x›
 /- 2. It is often possible to bring a component of a formula outside a universal quantifier,
         when it does not depend on the quantified variable. Try proving these
         (one direction of the second of these requires classical logic) -/
 variable (α : Type) (p q : α → Prop)
 variable (r : Prop)
 
-example : α → ((∀ x : α, r) ↔ r) := sorry
-example : (∀ x, p x ∨ r) ↔ (∀ x, p x) ∨ r := sorry
-example : (∀ x, r → p x) ↔ (r → ∀ x, p x) := sorry
+example : α → ((∀ x : α, r) ↔ r) := by
+  intro a; constructor
+  · intro h; exact h a
+  · intro hr x; exact hr
+example : (∀ x, p x ∨ r) ↔ (∀ x, p x) ∨ r := by
+  constructor
+  · intro h; by_cases hr : r
+    · exact Or.inr hr
+    · exact Or.inl (fun x => (h x).resolve_right hr)
+  · intro h x; cases h
+    · left;  apply ‹∀ x, p x›
+    · right; apply ‹r›
+example : (∀ x, r → p x) ↔ (r → ∀ x, p x) := by
+  constructor
+  · intro h r; intro x; exact h x r
+  · intro h x r; exact h r $ x
 
 /- 3. Consider the “barber paradox,” that is, the claim that
       > in a certain town there is a (male) barber that shaves
@@ -420,8 +442,21 @@ example : (∀ x, r → p x) ↔ (r → ∀ x, p x) := sorry
       Prove that this is a contradiction -/
 variable (men : Type) (barber : men)
 variable (shaves : men → men → Prop)
+-- Dot notation doesn't work here because 'men' is just a Type variable, not an inductive type
+def men.shave := shaves  -- This would work if 'men' were an actual inductive type
+#check_failure barber.shave barber  -- Dot notation doesn't work here
+#check shaves barber barber  -- Direct function application works fine
 
-example (h : ∀ x : men, shaves barber x ↔ ¬ shaves x x) : False := sorry
+example (h : ∀ x : men, shaves barber x ↔ ¬ shaves x x) : False := by
+  have hb := h barber  -- Consider whether the barber shaves himself
+  cases Classical.em (shaves barber barber) with
+  | inl h_shaves =>
+    -- If barber shaves himself, then by hb.mp, he doesn't shave himself
+    exact hb.mp h_shaves h_shaves
+  | inr h_not_shaves =>
+    -- If barber doesn't shave himself, then by hb.mpr, he does shave himself
+    exact h_not_shaves (hb.mpr h_not_shaves)
+
 
 /- 4. Note that without parameters, an expr of type `Prop` is just an assertion.
     Fill in the definitions of prime and Fermat_prime below,
@@ -432,21 +467,21 @@ example (h : ∀ x : men, shaves barber x ↔ ¬ shaves x x) : False := sorry
   - __Goldbach's weak conjecture__ states that
       > every odd number greater than 5 is the sum of three primes.
   - Look up the definition of a Fermat prime or any of the other statements, if necessary. -/
-def even (n : Nat) : Prop := sorry
+def even (n : Nat) : Prop := 2 ∣∣ n
 
-def prime (n : Nat) : Prop := sorry
+def prime (n : Nat) : Prop := ∀ m > 0 , m ∣∣ n → m = 1 ∨ m = n
 
-def infinitely_many_primes : Prop := sorry
+def infinitely_many_primes : Prop := ∀ n : Nat, ∃ p : Nat, prime p ∧ p > n
 
-def Fermat_prime (n : Nat) : Prop := sorry
+def Fermat_prime (n : Nat) : Prop := ∀ a b : Nat, a > 0 → b > 0 → (a^n + b^n = (a + b)^n) → False
 
-def infinitely_many_Fermat_primes : Prop := sorry
+def infinitely_many_Fermat_primes : Prop := ∀ n : Nat, ∃ p : Nat, Fermat_prime p ∧ p > n
 
-def goldbach_conjecture : Prop := sorry
+def goldbach_conjecture : Prop := ∀ n : Nat, n > 2 → ∃ p1 p2 : Nat, prime p1 ∧ prime p2 ∧ p1 + p2 = n
 
-def Goldbach's_weak_conjecture : Prop := sorry
+def Goldbach's_weak_conjecture : Prop := ∀ n : Nat, n > 5 ∧ (¬ (even n))→ ∃ p1 p2 p3 : Nat, prime p1 ∧ prime p2 ∧ prime p3 ∧ p1 + p2 + p3 = n
 
-def Fermat's_last_theorem : Prop := sorry
+def Fermat's_last_theorem : Prop := ∀ n : Nat, n > 2 → ∀ a b c : Nat, a^n + b^n = c^n → False
 
 /- 5. Prove as many of the identities listed in the Existential Quantifier section as you can. -/--LINK #∃ids
 
