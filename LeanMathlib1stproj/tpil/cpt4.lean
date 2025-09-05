@@ -175,8 +175,8 @@ example (h₁ : divides x y) (h₂ : y = z) : divides x (2*z) :=
     divides _ (2*z) := divides_mul ..
 
 namespace DividesNotation
-infix:50 " ∣∣ " => divides -- can be entered as `\dvd` or `\mid`
-
+scoped infix:50 " ∣ " => divides -- can be entered as `\dvd` or `\mid`
+scoped infix:50 " ∣∣ " => divides -- can be entered as `\dvd` or `\mid`
 example (h₁ : divides x y) (h₂ : y = z) : divides x (2*z) :=
   calc
     x ∣∣ y   := h₁
@@ -298,6 +298,7 @@ example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) :=
         (fun ⟨a, hqa⟩ => ⟨a, (Or.inr hqa)⟩))
 #check Decidable.of_not_not
 #check byContradiction
+#check Decidable.byContradiction
 example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) := by
   constructor
   · intro h hne; exact Exists.elim hne (fun w hnw => hnw (h w))
@@ -467,9 +468,10 @@ example (h : ∀ x : men, shaves barber x ↔ ¬ shaves x x) : False := by
   - __Goldbach's weak conjecture__ states that
       > every odd number greater than 5 is the sum of three primes.
   - Look up the definition of a Fermat prime or any of the other statements, if necessary. -/
-def even (n : Nat) : Prop := 2 ∣∣ n
+-- open scoped DividesNotation
+def even (n : Nat) : Prop := 2 ∣ n
 
-def prime (n : Nat) : Prop := ∀ m > 0 , m ∣∣ n → m = 1 ∨ m = n
+def prime (n : Nat) : Prop := ∀ m > 0 , m ∣ n → m = 1 ∨ m = n
 
 def infinitely_many_primes : Prop := ∀ n : Nat, ∃ p : Nat, prime p ∧ p > n
 
