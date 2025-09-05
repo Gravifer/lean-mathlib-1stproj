@@ -272,14 +272,18 @@ theorem even_plus_even' (h1 : IsEven a) (h2 : IsEven b) :
 
 -- TODO[epic=exercise,id=∃ids] - common identities involving ∃
 open Classical
+set_option linter.unusedVariables false
 
 variable (α : Type) (p q : α → Prop)
 variable (a : α)
 variable (r : Prop)
 
-example : (∃ x : α, r) → r := sorry
-example (a : α) : r → (∃ x : α, r) := sorry
-example : (∃ x, p x ∧ r) ↔ (∃ x, p x) ∧ r := sorry
+example : (∃ x : α, r) → r := by  intro h; exact Exists.elim h (fun w hw => hw)
+example (a : α) : r → (∃ x : α, r) := by  intro hr; exact ⟨a, hr⟩
+example : (∃ x, p x ∧ r) ↔ (∃ x, p x) ∧ r := by
+  constructor
+  · intro h; exact Exists.elim h (fun w hw => ⟨⟨w, hw.left⟩, hw.right⟩)
+  · intro ⟨⟨w, hpw⟩, hr⟩; exact ⟨w, hpw, hr⟩
 example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) :=
   Iff.intro
     (fun ⟨a, (h1 : p a ∨ q a)⟩ =>
@@ -290,12 +294,24 @@ example : (∃ x, p x ∨ q x) ↔ (∃ x, p x) ∨ (∃ x, q x) :=
       Or.elim h
         (fun ⟨a, hpa⟩ => ⟨a, (Or.inl hpa)⟩)
         (fun ⟨a, hqa⟩ => ⟨a, (Or.inr hqa)⟩))
-
-example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) := sorry
-example : (∃ x, p x) ↔ ¬ (∀ x, ¬ p x) := sorry
-example : (¬ ∃ x, p x) ↔ (∀ x, ¬ p x) := sorry
-example : (¬ ∀ x, p x) ↔ (∃ x, ¬ p x) := sorry
-
+#check Decidable.of_not_not
+#check byContradiction
+example : (∀ x, p x) ↔ ¬ (∃ x, ¬ p x) := by
+  constructor
+  · intro h hne; exact Exists.elim hne (fun w hnw => hnw (h w))
+  · intro h x; exact byContradiction (fun hn => h ⟨x, hn⟩)
+example : (∃ x, p x) ↔ ¬ (∀ x, ¬ p x) := by
+  constructor
+  · intro h h1; exact Exists.elim h (fun w hw => h1 w hw)
+  · intro h; exact byContradiction (fun hn => h (fun x => byContradiction (fun hw => hn ⟨x, Decidable.of_not_not hw⟩)))
+example : (¬ ∃ x, p x) ↔ (∀ x, ¬ p x) := by
+  constructor
+  · intro h x hp; exact h ⟨x, hp⟩
+  · intro h ⟨x, hp⟩; exact h x hp
+example : (¬ ∀ x, p x) ↔ (∃ x, ¬ p x) := by
+  constructor
+  · intro h; exact byContradiction (fun hn => h (fun x => byContradiction (fun hp => hn ⟨x, hp⟩)))
+  · intro h h1; exact Exists.elim h (fun w hw => hw (h1 w))
 example : (∃ x, p x → r) ↔ (∀ x, p x) → r :=
   Iff.intro
     (fun ⟨b, (hb : p b → r)⟩ =>
@@ -315,8 +331,23 @@ example : (∃ x, p x → r) ↔ (∀ x, p x) → r :=
                     have hex : ∃ x, p x → r := ⟨x, (fun hp => absurd hp hnp)⟩
                     show False from hnex hex)
               show False from hnap hap)))
-example (a : α) : (∃ x, p x → r) ↔ (∀ x, p x) → r := sorry
-example (a : α) : (∃ x, r → p x) ↔ (r → ∃ x, p x) := sorry
+example (a : α) : (∃ x, p x → r) ↔ (∀ x, p x) → r := by
+  constructor
+  · intro he ha; exact Exists.elim he (fun w hw => hw (ha w))
+  · intro har; by_cases ha : ∀ x, p x
+    · exact ⟨a, fun hp => har ha⟩
+    · exact Exists.intro
+        (Classical.choose (Classical.not_forall.mp ha))
+        (fun hp => absurd hp (Classical.choose_spec (Classical.not_forall.mp ha)))
+example (a : α) : (∃ x, r → p x) ↔ (r → ∃ x, p x) := by
+  constructor
+  · intro he hr; exact Exists.elim he (fun w hw => ⟨w, hw hr⟩)
+  · intro har; by_cases hr : r
+    · exact Exists.elim (har hr) (fun w hw => ⟨w, fun _ => hw⟩)
+    · exact ⟨a, fun h => absurd hr $ not_not.mpr h⟩
+#check choose
+#check choose_spec
+#check not_forall
 
 end sect4
 
