@@ -7,13 +7,14 @@ set_option relaxedAutoImplicit true
 /-
   - Commands:
     1. Use `#check`  to check the type of an expression.
+        -  `#check_failure` to check that an expression does not typecheck.
     2. Use `#eval`   to evaluate an expression.
     3. Use `#print`  to print the definition of a term.
         -  `#print axioms <theorem>` lists the axioms used in the proof of `<theorem>`.
     4. Use `#synth`  to synthesize an instance of a type class.
     5. Use `#find`   to search for declarations matching a pattern.
     6. Use `#guard`  to assert that an expression has a certain type.
-        -  `#guard_msg`    to assert that a command produces a certain message.
+        -  `#guard_msgs`    to assert that a command produces a certain message.
         -  `#guard_hyp`    to assert that a hypothesis has a certain type.
         -  `#guard_expr`   to assert that an expression is equal to another expression.
         -  `#guard_prefix` to assert that a declaration has a certain prefix.
