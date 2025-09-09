@@ -21,6 +21,7 @@ layout: default
 - [How to Prove It - with Lean](https://djvelleman.github.io/HTPIwL/)
 - [Hitchhiker's Guide to Logical Verification](https://github.com/blanchette/interactive_theorem_proving_2025)
 - [Glimpse of Lean](https://github.com/PatrickMassot/GlimpseOfLean)
+- [Logic and Proof](https://leanprover-community.github.io/logic_and_proof)
 - [The Mechanics of Proof](https://github.com/hrmacbeth/math2001)
 
 ## See also
