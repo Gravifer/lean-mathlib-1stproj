@@ -1,3 +1,6 @@
 [submodule "LeanMathlib1stproj/mil"]
 	path = LeanMathlib1stproj/mil
 	url = https://github.com/Gravifer/lean-comm.mathematics_in_lean.git
+[submodule "LeanMathlib1stproj/mpil"]
+	path = LeanMathlib1stproj/mpil/repo
+	url = https://github.com/leanprover-community/lean4-metaprogramming-book.git
