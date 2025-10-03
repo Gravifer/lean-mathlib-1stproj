@@ -1,6 +1,6 @@
 name = "lean-mathlib-1stproj"
-version = "0.1.0"
-keywords = ["math"]
+version = "0.2.0"
+keywords = ["math", "learning", "newcomer", "functional programming"]
 defaultTargets = ["LeanMathlib1stproj"]
 
 [leanOptions]
@@ -9,6 +9,8 @@ autoImplicit = false
 relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
 maxSynthPendingDepth = 3
+experimental.module = true # *see <https://lean-lang.org/doc/reference/latest/The-Module-System>
+# experimental.inductiveCompVal = true
 
 [[require]]
 name = "mathlib"
