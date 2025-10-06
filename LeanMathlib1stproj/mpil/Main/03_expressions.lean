@@ -56,3 +56,87 @@ end Playground
 
 /-! ## Constructing Expressions -/
 /-! ### Constants -/
+open Lean
+def z' := Expr.const `Nat.zero []
+#eval z' -- Lean.Expr.const `Nat.zero []
+def z := Expr.const ``Nat.zero []
+#eval z  -- Lean.Expr.const `Nat.zero []
+/-
+The double-backtick variant checks that the name in fact refers to a defined constant.
+It also resolves the given name, making it fully-qualified.
+The first expression, `z₁`, is unsafe:
+  if we use it in a context where the `Nat` namespace is not open,
+  Lean will complain that there is no constant called `zero` in the environment.
+In contrast, the second expression, `z₂`,
+  contains the fully-qualified name `Nat.zero` and does not have this problem.
+-/
+
+/-! ### Function Applications -/
+/-! ### Lambda Abstractions -/
+
+/-! ## Exercises -/
+namespace mpil
+-- 1. Create expression `1 + 2` with `Expr.app`.
+def zero:= Expr.const ``Nat.zero []
+def one := Expr.app (.const ``Nat.succ []) (.const ``zero [])
+def two := Expr.app (.const ``Nat.succ []) (.const ``one [])
+def add_1_2 := Expr.app (Expr.app (.const ``Nat.add []) one) two
+#eval add_1_2
+
+-- 2. Create expression `1 + 2` with `Lean.mkAppN`.
+def add_1_2' := Lean.mkAppN (Expr.const ``Nat.add []) #[one, two]
+-- 3. Create expression `fun x => 1 + x`.
+def nat : Expr := .const ``Nat []
+def oneAdd : Expr :=
+  .lam `x nat
+    (mkAppN (.const ``Nat.add []) #[.bvar 0, mkNatLit 1])
+    BinderInfo.default
+def mapOneAddNil : Expr :=
+  mkAppN (.const ``List.map [levelZero, levelZero])
+    #[nat, nat, oneAdd, .app (.const ``List.nil [levelZero]) nat]
+-- 4. [**De Bruijn Indexes**] Create expression `fun a, fun b, fun c, (b * a) + c`.
+def mulAdd : Expr :=
+  .lam `a nat
+    (.lam `b nat
+      (.lam `c nat
+        (mkAppN (.const ``Nat.add [])
+          #[mkAppN (.const ``Nat.mul []) #[.bvar 1, .bvar 2], .bvar 0])
+        BinderInfo.default)
+      BinderInfo.default)
+    BinderInfo.default
+-- 5. Create expression `fun x y => x + y`.
+def addXY : Expr :=
+  .lam `x nat
+    (.lam `y nat
+      (mkAppN (.const ``Nat.add []) #[.bvar 1, .bvar 0])
+      BinderInfo.default)
+    BinderInfo.default
+-- 6. Create expression `fun x, String.append "hello, " x`.
+-- open Lean in
+def appendHello : Expr :=
+  .lam `x (.const ``String [])
+    (mkAppN (.const ``String.append []) #[mkStrLit "hello, ", .bvar 0])
+    BinderInfo.default
+-- 7. Create expression `∀ x : Prop, x ∧ x`.
+def forallProp : Expr :=
+  .lam `x (Expr.sort Lean.Level.zero)
+    (mkAppN (.const ``And.intro []) #[.bvar 0, .bvar 0])
+    BinderInfo.default
+-- 8. Create expression `Nat → String`.
+def natToString : Expr :=
+  Expr.forallE `notUsed
+    (Expr.const `Nat []) (Expr.const `String [])
+    BinderInfo.default
+-- 9. Create expression `fun (p : Prop) => (λ hP : p => hP)`.
+def lambdaInLambda : Expr :=
+  Expr.lam `p (Expr.sort Lean.Level.zero)
+  (
+    Expr.lam `hP (Expr.bvar 0)
+    (Expr.bvar 0)
+    BinderInfo.default
+  )
+  BinderInfo.default
+-- 10. [**Universe levels**] Create expression `Type 6`.
+def type6 : Expr := Expr.sort (Level.succ (Level.succ (Level.succ (Level.succ (Level.succ (Level.succ Level.zero))))))
+example   : Expr := Expr.sort (Nat.toLevel 7)
+end mpil
