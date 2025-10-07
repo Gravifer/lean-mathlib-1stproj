@@ -107,3 +107,8 @@ def myAssumption (mvarId : MVarId) : MetaM Bool := do
 #print Lean.MVarId.checkNotAssigned
 #print Lean.Meta.isDefEq
 #print Lean.LocalDecl.toExpr
+
+/-! ### Metavariable Depth-/
+#print Lean.Meta.withNewMCtxDepth
+
+/-! ## Computation -/
