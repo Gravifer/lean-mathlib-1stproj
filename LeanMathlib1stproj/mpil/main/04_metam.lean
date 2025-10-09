@@ -223,3 +223,15 @@ set_option pp.explicit true in
 #print Lean.mkArrow
 
 /-! ### Deconstructing Expressions -/
+#print Lean.Meta.forallTelescope
+#print Lean.Meta.forallTelescopeReducing
+#print Lean.Meta.forallBoundedTelescope
+#print Lean.Meta.forallMetaTelescope
+#print Lean.Meta.forallMetaTelescopeReducing
+#print Lean.Meta.forallMetaBoundedTelescope
+#print Lean.Meta.lambdaTelescope
+--// #print Lean.Meta.lambdaTelescopeReducing --? No longer athing?
+#print Lean.Meta.lambdaBoundedTelescope
+#print Lean.Meta.lambdaMetaTelescope
+
+/-! ## Backtracking -/
