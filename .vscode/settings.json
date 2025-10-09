@@ -70,6 +70,8 @@
         "/**",
         "*",
         "#",
+        "/--",
+        "/-!",
         "/-",
         "--"
     ],
@@ -78,5 +80,23 @@
         "*/",
         "-/"
     ],
-    "bookmarks.saveBookmarksInProject": true
+    "bookmarks.saveBookmarksInProject": true,
+    "files.readonlyInclude": {
+        "**/.lake/**/*.lean": true,
+        "**/.elan/**/*.lean": true,
+        "**/mpil/repo/**/*": true
+    },
+    "git.autofetch": "all",
+    "git.autoStash": true,
+    "git.blame.editorDecoration.enabled": true,
+    "git.enableSmartCommit": true,
+    "git.fetchOnPull": true,
+    "git.followTagsWhenSync": true,
+    "git.ignoredRepositories": [
+        "LeanMathlib1stproj/mpil/repo",
+        "LeanMathlib1stproj/mil"
+    ],
+    "cSpell.words": [
+        "WHNF"
+    ]
 }
