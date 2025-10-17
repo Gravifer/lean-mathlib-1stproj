@@ -14,7 +14,7 @@ open Lean Elab Command Term Meta
 
   All commands live in the `command` syntax category so in order to declare
   custom commands, their syntax has to be registered in that category. -/
-/-! ### Giving meaning to commands -/
+/-! ### Semantics -/
 #print CommandElabM
 #print CommandElab
 /- The `CommandElabM` monad has 4 main kinds of side effects:
@@ -43,7 +43,7 @@ open Lean Elab Command Term Meta
 #print IO
 #print Macro.throwError
 
-/-! ### Command elaboration
+/-! ### Mechanism
   1. Check whether any macros can be applied to the current `Syntax`.
     If there is a macro that does apply and does not throw an error
     the resulting `Syntax` is recursively elaborated as a command again.
@@ -60,7 +60,7 @@ open Lean Elab Command Term Meta
 
   The general idea behind the procedure is quite similar to ordinary macro expansion.
 -/
-/-! ### Steps
+/-! ### Procedure
   1. Declaring the syntax
   2. Declaring the elaborator
   3. Registering the elaborator as responsible for the syntax
@@ -106,3 +106,95 @@ TODO:  Define a `conjecture` declaration, similar to `lemma/theorem`, except tha
 -/
 
 /-! ## Term elaboration -/
+/-! ### Semantics
+  As with command elaboration, the next step is giving some semantics to the syntax.
+  With terms, this is done by registering a so called term elaborator. -/
+#print TermElabM
+#print TermElab
+/- Term elaborators have type `TermElab`. This type is already
+  quite different from command elaboration:
+  - As with command elaboration the `Syntax` is whatever the user used
+    to create this term
+  - The `Option Expr` is the expected type of the term, since this cannot
+    always be known it is only an `Option` argument
+  - Unlike command elaboration, term elaboration is not only executed
+    because of its side effects -- the `TermElabM Expr` return value does
+    actually contain something of interest, namely, the `Expr` that represents
+    the `Syntax` object.
+
+  `TermElabM` is basically an upgrade of `CommandElabM` in every regard:
+  it supports all the capabilities we mentioned above, plus two more.
+  The first one is quite simple: On top of running `IO` code it is also
+  capable of running `MetaM` code, so `Expr`s can be constructed nicely.
+  The second one is very specific to the term elaboration loop.
+-/
+/-! ### Mechanics
+  The basic idea of term elaboration is the same as command elaboration:
+  expand macros and recurse or run term elaborators that have been registered
+  for the `Syntax` via the `term_elab` attribute (they might in turn run term elaboration)
+  until we are done. There is, however, one special action that a term elaborator
+  can do during its execution. -/
+#print Except
+#print Exception
+#print Elab.throwPostpone
+#print Term.synthesizeSyntheticMVars
+#print Elab.Term.SyntheticMVarKind
+
+/-! ### Procedure -/
+syntax (name := myterm1) "myterm_1" : term
+def mytermValues := [1, 2]
+@[term_elab myterm1]
+def myTerm1Impl : TermElab := fun stx type? => do
+  mkAppM ``List.get! #[.const ``mytermValues [], mkNatLit 0] -- `MetaM` code
+#eval myterm_1 -- 1
+-- Also works with `elab`
+elab "myterm_2" : term => do
+  mkAppM ``List.get! #[.const ``mytermValues [], mkNatLit 1] -- `MetaM` code
+#eval myterm_2 -- 2
+
+/-! ### Example: recreate `⟨⋯⟩` notation -/
+-- slightly different notation so no ambiguity happens
+syntax (name := myanon) "⟨⟨" term,* "⟩⟩" : term
+
+def getCtors (typ : Name) : MetaM (List Name) := do
+  let env ← getEnv
+  match env.find? typ with
+  | some (ConstantInfo.inductInfo val) =>
+    pure val.ctors
+  | _ => pure []
+
+@[term_elab myanon]
+def myanonImpl : TermElab := fun stx typ? => do
+  -- Attempt to postpone execution if the type is not known or is a metavariable.
+  -- Metavariables are used by things like the function elaborator to fill
+  -- out the values of implicit parameters when they haven't gained enough
+  -- information to figure them out yet.
+  -- Term elaborators can only postpone execution once, so the elaborator
+  -- doesn't end up in an infinite loop. Hence, we only try to postpone it,
+  -- otherwise we may cause an error.
+  tryPostponeIfNoneOrMVar typ?
+  -- If we haven't found the type after postponing just error
+  let some typ := typ? | throwError "expected type must be known"
+  if typ.isMVar then
+    throwError "expected type must be known"
+  let Expr.const base .. := typ.getAppFn | throwError s!"type is not of the expected form: {typ}"
+  let [ctor] ← getCtors base | throwError "type doesn't have exactly one constructor"
+  let args := TSyntaxArray.mk stx[1].getSepArgs
+  let stx ← `($(mkIdent ctor) $args*) -- syntax quotations
+  elabTerm stx typ -- call term elaboration recursively
+
+#check (⟨⟨1, sorry⟩⟩ : Fin 12) -- { val := 1, isLt := (_ : 1 < 12) } : Fin 12
+#check_failure ⟨⟨1, sorry⟩⟩ -- expected type must be known
+#check_failure (⟨⟨0⟩⟩ : Nat) -- type doesn't have exactly one constructor
+#check_failure (⟨⟨⟩⟩ : Nat → Nat) -- type is not of the expected form: Nat -> Nat
+
+/-!
+As a final note, we can shorten the postponing act by using an additional
+syntax sugar of the `elab` syntax instead:
+-/
+
+-- This `t` syntax will effectively perform the first two lines of `myanonImpl`
+elab "⟨⟨" args:term,* "⟩⟩" : term <= t => do
+  sorry
+
+/-! ## Exercises -/
