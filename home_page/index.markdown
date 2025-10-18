@@ -12,15 +12,25 @@ layout: default
 
 ## Roadmap
 
+### Prelude
+
+- [Lean Game Server](https://adam.math.hhu.de/)
+
+### Basics
+
+- [Theorem Proving in Lean](https://lean-lang.org/theorem_proving_in_lean4/)
+- [Glimpse of Lean](https://github.com/PatrickMassot/GlimpseOfLean#online-version-no-registration "Best do this before MIL")
+- [Mathematics in Lean](https://leanprover-community.github.io/mathematics_in_lean/)
 - [Functional Programming in Lean @ 4.1.0](https://leanprover.github.io/functional_programming_in_lean "Haskell-like introduction")
   - [Newer version @ 4.21.0](https://lean-lang.org/functional_programming_in_lean)
-- [Theorem Proving in Lean](https://lean-lang.org/theorem_proving_in_lean4/)
-- [Mathematics in Lean](https://leanprover-community.github.io/mathematics_in_lean/)
+
+### Details
+
 - [Metaprogramming in Lean](https://leanprover-community.github.io/lean4-metaprogramming-book)
   - [Short introduction](https://github.com/leanprover-community/mathlib4/wiki/Metaprogramming-for-dummies "metaprogramming-for-dummies")
 - [Typechecking in Lean 4](https://ammkrn.github.io/type_checking_in_lean4/)
+
 - [Hitchhiker's Guide to Logical Verification](https://github.com/blanchette/interactive_theorem_proving_2025)
-- [Glimpse of Lean](https://github.com/PatrickMassot/GlimpseOfLean)
 - [Logic and Proof](https://leanprover-community.github.io/logic_and_proof)
 - [The Mechanics of Proof](https://github.com/hrmacbeth/math2001)
 - [How to Prove It - with Lean](https://djvelleman.github.io/HTPIwL/)
@@ -32,11 +42,11 @@ layout: default
 - [Community sources for learning Lean 4](https://leanprover-community.github.io/learn.html)
 - [Lean community on Zulip](https://leanprover.zulipchat.com/)
 
-## Tips
+## Reference
 
 - [Next steps from FPIL](https://leanprover.github.io/functional_programming_in_lean/next-steps.html)
 - [Tactic metaprogramming cheatsheet](https://leanprover-community.github.io/lean4-metaprogramming-book/main/10_cheat-sheet.html)
-- [Significant changes in Lean 4 from Lean 3](https://lean-lang.org/lean4/doc/lean3changes.html)
+- [Significant changes from Lean 3](https://lean-lang.org/lean4/doc/lean3changes.html)
 - [Batteries (previously `std4`)](https://github.com/leanprover-community/batteries)
 
 ## Extra
