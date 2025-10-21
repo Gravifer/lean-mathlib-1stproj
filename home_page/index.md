@@ -56,5 +56,6 @@ layout: default
 - [Rocq : mathematical components](https://math-comp.github.io/mcb/)
 - [Software Foundations @ UPenn](https://softwarefoundations.cis.upenn.edu/)
 - [Type driven development with Idris](https://www.manning.com/books/type-driven-development-with-idris)
+- [Not-a-num](http://www.e-pig.org/downloads/notanum.pdf)
 - [Certified Programming with Dependent Types](https://adam.chlipala.net/cpdt/ "cpdt-coq")
 - [Concrete Semantics : with Isabelle/HOL](http://concrete-semantics.org/)
