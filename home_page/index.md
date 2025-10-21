@@ -18,21 +18,28 @@ layout: default
 
 ### Basics
 
-- [Theorem Proving in Lean](https://lean-lang.org/theorem_proving_in_lean4/)
+- [The Mechanics of Proof](https://github.com/hrmacbeth/math2001 "math2001@UFordham")
 - [Glimpse of Lean](https://github.com/PatrickMassot/GlimpseOfLean#online-version-no-registration "Best do this before MIL")
+
+### Official
+
+These are the official textbooks
+
+- [Theorem Proving in Lean](https://lean-lang.org/theorem_proving_in_lean4/)
 - [Mathematics in Lean](https://leanprover-community.github.io/mathematics_in_lean/)
 - [Functional Programming in Lean @ 4.1.0](https://leanprover.github.io/functional_programming_in_lean "Haskell-like introduction")
   - [Newer version @ 4.21.0](https://lean-lang.org/functional_programming_in_lean)
 
-### Details
+#### Details
 
 - [Metaprogramming in Lean](https://leanprover-community.github.io/lean4-metaprogramming-book)
   - [Short introduction](https://github.com/leanprover-community/mathlib4/wiki/Metaprogramming-for-dummies "metaprogramming-for-dummies")
 - [Typechecking in Lean 4](https://ammkrn.github.io/type_checking_in_lean4/)
 
+### Extra
+
 - [Hitchhiker's Guide to Logical Verification](https://github.com/blanchette/interactive_theorem_proving_2025)
 - [Logic and Proof](https://leanprover-community.github.io/logic_and_proof)
-- [The Mechanics of Proof](https://github.com/hrmacbeth/math2001)
 - [How to Prove It - with Lean](https://djvelleman.github.io/HTPIwL/)
 
 ## Sources
@@ -42,14 +49,14 @@ layout: default
 - [Community sources for learning Lean 4](https://leanprover-community.github.io/learn.html)
 - [Lean community on Zulip](https://leanprover.zulipchat.com/)
 
-## Reference
+### Reference
 
 - [Next steps from FPIL](https://leanprover.github.io/functional_programming_in_lean/next-steps.html)
 - [Tactic metaprogramming cheatsheet](https://leanprover-community.github.io/lean4-metaprogramming-book/main/10_cheat-sheet.html)
 - [Significant changes from Lean 3](https://lean-lang.org/lean4/doc/lean3changes.html)
 - [Batteries (previously `std4`)](https://github.com/leanprover-community/batteries)
 
-## Extra
+## External
 
 - [Foundations of Lean](https://leanprover-community.github.io/lean-perfectoid-spaces/type_theory.html)
 - [The HoTT Book](https://homotopytypetheory.org/book/)
